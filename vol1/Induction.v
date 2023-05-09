@@ -204,22 +204,34 @@ Proof.
 Theorem mul_0_r : forall n:nat,
   n * 0 = 0.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  induction n as [|n' Ihn']. 
+  - reflexivity.
+  - simpl. rewrite -> Ihn'. reflexivity.
+Qed.
 
 Theorem plus_n_Sm : forall n m : nat,
   S (n + m) = n + (S m).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  induction n as [|n' Ihn'].
+  - reflexivity.
+  - intro m. simpl. rewrite -> Ihn'. reflexivity.
+Qed.
 
 Theorem add_comm : forall n m : nat,
   n + m = m + n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  induction n as [|n' Ihm']. 
+  -  intro m. rewrite -> add_0_r. reflexivity.
+  -  simpl. intro m. rewrite <- plus_n_Sm. rewrite -> Ihm'. reflexivity.
+Qed.
 
 Theorem add_assoc : forall n m p : nat,
   n + (m + p) = (n + m) + p.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  induction n as [|n' Ihm'].
+  - intro m. intro p. reflexivity.
+  - simpl. intro m. intro p. rewrite -> Ihm'. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (double_plus)
@@ -236,7 +248,10 @@ Fixpoint double (n:nat) :=
 
 Lemma double_plus : forall n, double n = n + n .
 Proof.
-  (* FILL IN HERE *) Admitted.
+  induction n as [|n' Ihn'].
+  - reflexivity.
+  - simpl. rewrite -> Ihn'. rewrite <- plus_n_Sm. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (eqb_refl)
@@ -246,7 +261,10 @@ Proof.
 Theorem eqb_refl : forall n : nat,
   (n =? n) = true.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  induction n as [|n' Ihn'].
+  - reflexivity.
+  - simpl. rewrite -> Ihn'. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (even_S)
@@ -261,7 +279,10 @@ Proof.
 Theorem even_S : forall n : nat,
   even (S n) = negb (even n).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  induction n as [|n' Ihn']. 
+  - reflexivity.
+  - rewrite -> Ihn'. rewrite -> negb_involutive. reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 1 star, standard, optional (destruct_induction)
@@ -269,7 +290,12 @@ Proof.
     Briefly explain the difference between the tactics [destruct]
     and [induction].
 
-(* FILL IN HERE *)
+(* The destruct tactic allows us to prove a proposition over a data type
+   by going over each possible case and proving them individually. 
+   The induction tactic also splits the proof, but allows us to prove 
+   a proposition via induction by exposing an induction hypothesis. 
+   This induction hypothesis can be used to prove the recursive cases
+   where the constructor of the type receives a value of the same type. *)
 *)
 
 (** [] *)
@@ -358,7 +384,7 @@ Proof.
 
     Acts of communication may involve different sorts of readers.  On
     one hand, the "reader" can be a program like Coq, in which case
-    the "belief" that is instilled is that [P] can be mechanically
+    the "belief" that is instilled is that [P] can be mechanically 
     derived from a certain set of formal logical rules, and the proof
     is a recipe that guides the program in checking this fact.  Such
     recipes are _formal_ proofs.
@@ -499,7 +525,13 @@ Definition manual_grade_for_eqb_refl_informal : option (nat*string) := None.
 Theorem add_shuffle3 : forall n m p : nat,
   n + (m + p) = m + (n + p).
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros n m p.
+  assert (H1: n + (m + p) = (n + m) + p).
+  {rewrite -> add_assoc. reflexivity. }
+  assert (H2: n + m = m + n).
+  {rewrite -> add_comm. reflexivity. }
+  rewrite -> H1. rewrite add_assoc. rewrite H2. reflexivity.
+Qed.
 
 (** Now prove commutativity of multiplication.  You will probably want
     to look for (or define and prove) a "helper" theorem to be used in
@@ -508,7 +540,25 @@ Proof.
 Theorem mul_comm : forall m n : nat,
   m * n = n * m.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  assert (H : forall n k: nat, n * (1 + k) = n + n * k). {
+    induction n as [|n' Ihn'].
+    - reflexivity.
+    - simpl. intro k. rewrite add_assoc. rewrite -> Ihn'.
+          assert(A: n' + k = k + n'). { rewrite add_comm. reflexivity. }
+          rewrite A. rewrite <- add_assoc. reflexivity.
+  }
+  induction n as [|n' Ihn'].
+  - induction m as [|m' Ihm'].
+    + reflexivity.
+    + simpl. rewrite -> Ihm'. reflexivity.
+  - destruct m as [|m'].
+    + simpl. rewrite <- Ihn'. reflexivity.
+    + simpl. rewrite <- Ihn'. rewrite -> H. simpl. rewrite add_assoc.  
+      assert(A: n' + m' = m' + n'). 
+      { rewrite add_comm. reflexivity. }  
+      rewrite -> A. rewrite <- add_assoc. 
+  reflexivity.
+Qed.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (plus_leb_compat_l)
