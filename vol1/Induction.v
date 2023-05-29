@@ -886,46 +886,35 @@ end.
 
 Theorem bin_nat_bin : forall b, nat_to_bin (bin_to_nat b) = normalize b.
 Proof.
-assert(H1: forall a : bin,
-          bin_to_nat a + bin_to_nat a = bin_to_nat (double_bin a)).
-  {
-    induction a as [|a0' Iha0'|a1' Iha1'].
-    - reflexivity. 
-    - simpl.
-      rewrite Iha0'.
-      reflexivity.
-    - simpl.
-      rewrite Iha1'.
-      reflexivity.
+assert (L1 : forall m : nat, nat_to_bin (m + m) = double_bin (nat_to_bin m)). 
+    { simpl. 
+      induction m as [|m' Ihm'].
+      + reflexivity.
+      + simpl.
+        rewrite -> add_comm.
+        simpl.
+        rewrite -> double_incr_bin.
+        rewrite -> Ihm'.
+        reflexivity.
+    }
+induction b as [|n1 Ih1 | n2 Ih2].
+ + reflexivity.
+ + simpl. 
+   rewrite -> L1.
+   rewrite -> Ih1.
+   reflexivity.
+ + simpl.
+   rewrite -> L1.
+   rewrite -> Ih2.
+   assert (L2 : forall b : bin, incr (double_bin b) = B1 b). {
+    destruct b as [|b1 |b2 ].
+    - reflexivity.
+    - reflexivity.
+    - reflexivity.
   }
-assert(H2: forall a : bin, 
-          nat_to_bin (bin_to_nat (double_bin a)) = double_bin (nat_to_bin (bin_to_nat a))).
-  {
-    induction a as [|a0' Iha0'|a1' Iha1'].
-    - reflexivity. 
-    - simpl.
-      rewrite H1.
-      rewrite H1.
-      rewrite Iha0'.
-      reflexivity.
-    - simpl.
-      rewrite Iha1'.
-      reflexivity.
-  }
-induction b as [|b0' Ihb0' | b1' Ihb1'].
-- reflexivity.
-- simpl. 
-  rewrite H.
-  rewrite Ihb0'.
-  reflexivity.
-- simpl.
-  rewrite H.
-  assert(H2: forall a : bin, incr (double_bin a) = B1 a). {simpl. } 
-  rewrite H2.
-  rewrite Ihb1'.
-  reflexivity.
-
-Admitted.
+   rewrite -> L2.
+   reflexivity.
+Qed.
 
 (** [] *)
 
