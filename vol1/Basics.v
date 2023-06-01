@@ -3,7 +3,7 @@
 (* REMINDER:
 
           #####################################################
-          ###  PLEASE DO NOT DISTRIBUTE SOLUTIONS PUBLICLY  ###
+          ###  PLE ASE DO NOT DISTRIBUTE SOLUTIONS PUBLICLY  ###
           #####################################################
 
    (See the [Preface] for why.)
