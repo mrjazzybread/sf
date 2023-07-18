@@ -218,6 +218,8 @@ Inductive bool : Type :=
   | true
   | false.
 
+Inductive b : bool := A.
+
 (** Functions over booleans can be defined in the same way as
     above: *)
 

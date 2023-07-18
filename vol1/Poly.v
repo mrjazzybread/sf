@@ -45,6 +45,9 @@ Inductive list (X:Type) : Type :=
   | nil
   | cons (x : X) (l : list X).
 
+
+Inductive abst : Type.
+
 (** This is exactly like the definition of [natlist] from the
     previous chapter, except that the [nat] argument to the [cons]
     constructor has been replaced by an arbitrary type [X], a binding
