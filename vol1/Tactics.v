@@ -1193,12 +1193,37 @@ Qed.
     Your property will need to account for the behavior of [combine]
     in its base cases, which possibly drop some list elements. *)
 
-Definition split_combine_statement : Prop := 1 = 1.
+Search list.
+
+Definition split_combine_statement : Prop := 
+  forall (X Y : Type) (l1 : list X) (l2 : list Y) (l : list (X * Y)),
+  length l1 = length l2 -> combine l1 l2 = l -> split l = (l1, l2).
 
 
 Theorem split_combine : split_combine_statement.
 Proof.
-  unfold split_combine_statement. reflexivity.
+  unfold split_combine_statement.
+  intros.
+  generalize dependent l2. 
+  generalize dependent l1. 
+  induction l as [|h t Ihl]. 
+  + intros. simpl. 
+    destruct l1.
+    - destruct l2.
+      * reflexivity.
+      * discriminate H.
+    - destruct l2 eqn:E2.
+      * discriminate H.
+      * discriminate H0. 
+  + intros.
+    destruct l1.
+    - discriminate H0.
+    - destruct l2.
+      * discriminate H0.
+      * simpl. rewrite Ihl with l1 l2.
+      { destruct h eqn:E1. simpl in H0. inversion H0. reflexivity. }
+      { simpl in H. injection H. intros. apply H1. }
+      { simpl in H0. inversion H0. reflexivity. }
 Qed.
 
 (* Do not modify the following line: *)
@@ -1212,7 +1237,7 @@ Theorem filter_exercise : forall (X : Type) (test : X -> bool)
                                  (x : X) (l lf : list X),
   filter test l = x :: lf ->
   test x = true.
-Proof.
+Proof. 
   intros.
   destruct (test x) eqn:E1.
   + reflexivity.
@@ -1300,7 +1325,7 @@ Proof. (* FILL IN HERE *)
   + reflexivity.
   + unfold existsb'. 
     simpl. 
-    destruct (test h) eqn:E1.
+    destruct (test h).
     - simpl. reflexivity.
     - simpl. transitivity (existsb' test t).
       * apply Ihl.

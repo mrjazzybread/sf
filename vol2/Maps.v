@@ -188,10 +188,7 @@ Proof. reflexivity. Qed.
 Lemma t_apply_empty : forall (A : Type) (x : string) (v : A),
   (_ !-> v) x = v.
 Proof.
-  intros.
-  unfold t_empty.
-  reflexivity. 
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (t_update_eq)
@@ -203,11 +200,7 @@ Qed.
 Lemma t_update_eq : forall (A : Type) (m : total_map A) x v,
   (x !-> v ; m) x = v.
 Proof.
-  intros.
-  unfold t_update.
-  rewrite eqb_refl.
-  reflexivity.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (t_update_neq)
@@ -220,12 +213,7 @@ Theorem t_update_neq : forall (A : Type) (m : total_map A) x1 x2 v,
   x1 <> x2 ->
   (x1 !-> v ; m) x2 = m x2.
 Proof.
-  intros.
-  unfold t_update.
-  destruct (x1 =? x2)%string eqn:E.
-  - apply eqb_eq in E. unfold not in H. apply H in E. destruct E.
-  - reflexivity.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard, optional (t_update_shadow)
@@ -239,14 +227,7 @@ Qed.
 Lemma t_update_shadow : forall (A : Type) (m : total_map A) x v1 v2,
   (x !-> v2 ; x !-> v1 ; m) = (x !-> v2 ; m).
 Proof.
-  intros.
-  unfold t_update.
-  apply functional_extensionality.
-  intros.
-  destruct (x =? x0)%string.
-  - reflexivity.
-  - reflexivity.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (** **** Exercise: 2 stars, standard (t_update_same)
@@ -263,14 +244,7 @@ Qed.
 Theorem t_update_same : forall (A : Type) (m : total_map A) x,
   (x !-> m x ; m) = m.
 Proof.
-  intros.
-  apply functional_extensionality.
-  intros.
-  unfold t_update.
-  destruct (x =? x0)%string eqn:E.
-  - apply eqb_eq in E. rewrite E. reflexivity.
-  - reflexivity.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard, especially useful (t_update_permute)
@@ -286,17 +260,7 @@ Theorem t_update_permute : forall (A : Type) (m : total_map A)
   =
   (x2 !-> v2 ; x1 !-> v1 ; m).
 Proof.
-  intros.
-  apply functional_extensionality.
-  intros.
-  unfold t_update.
-  unfold not in H.
-  destruct (x1 =? x)%string eqn:E1.
-  - apply eqb_eq in E1. destruct (x2 =? x)%string eqn:E2. 
-    + apply eqb_eq in E2. destruct H. transitivity x. * apply E2. * symmetry. apply E1.
-    + reflexivity.
-  - reflexivity.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (* ################################################################# *)
@@ -410,4 +374,4 @@ Qed.
     used to keep track of which program variables are defined in a
     given scope. *)
 
-(* 2023-03-25 11:11 *)
+(* 2023-08-23 11:31 *)

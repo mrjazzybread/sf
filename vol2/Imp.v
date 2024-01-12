@@ -29,7 +29,7 @@ From Coq Require Import Arith.EqNat. Import Nat.
 From Coq Require Import Lia.
 From Coq Require Import Lists.List. Import ListNotations.
 From Coq Require Import Strings.String.
-From LF Require Import Maps.
+From PLF Require Import Maps.
 Set Default Goal Selector "!".
 
 (* ################################################################# *)
@@ -133,7 +133,7 @@ Inductive bexp : Type :=
 
 Fixpoint aeval (a : aexp) : nat :=
   match a with
-  | ANum n => n
+  | ANum n =>n
   | APlus  a1 a2 => (aeval a1) + (aeval a2)
   | AMinus a1 a2 => (aeval a1) - (aeval a2)
   | AMult  a1 a2 => (aeval a1) * (aeval a2)
@@ -464,29 +464,13 @@ Admitted.
     it is sound.  Use the tacticals we've just seen to make the proof
     as short and elegant as possible. *)
 
-Fixpoint optimize_0plus_b (b : bexp) : bexp :=
-   match b with
-  | BEq a1 a2   => BEq (optimize_0plus a1) (optimize_0plus a2)
-  | BNeq a1 a2  => BNeq (optimize_0plus a1) (optimize_0plus a2)
-  | BLe a1 a2   => BLe (optimize_0plus a1) (optimize_0plus a2)
-  | BGt a1 a2   => BGt (optimize_0plus a1) (optimize_0plus a2)
-  | BNot b1     => BNot (optimize_0plus_b b1)
-  | BAnd b1 b2  => BAnd (optimize_0plus_b b1) (optimize_0plus_b b2)
-  |_ => b
-  end.
+Fixpoint optimize_0plus_b (b : bexp) : bexp
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
 
 Theorem optimize_0plus_b_sound : forall b,
   beval (optimize_0plus_b b) = beval b.
 Proof.
-  intros.
-  induction b;
-  simpl; 
-  try reflexivity;
-  repeat rewrite optimize_0plus_sound;
-  try reflexivity.
-  - repeat (rewrite IHb). reflexivity.
-  - rewrite IHb1. rewrite IHb2. reflexivity.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (** **** Exercise: 4 stars, standard, optional (optimize)
@@ -864,27 +848,14 @@ Qed.
 
 Reserved Notation "e '==>b' b" (at level 90, left associativity).
 Inductive bevalR: bexp -> bool -> Prop :=
-  |E_BTrue : BTrue ==>b true
-  |E_BFalse : BFalse ==>b false
-  |E_BEq a1 a2 n1 n2 : a1 ==> n1 -> a2 ==> n2 -> BEq a1 a2 ==>b n1 =? n2
-  |E_BNeq a1 a2 n1 n2 : a1 ==> n1 -> a2 ==> n2 -> BNeq a1 a2 ==>b negb (n1 =? n2)
-  |E_BLe a1 a2 n1 n2 : a1 ==> n1 -> a2 ==> n2 -> BLe a1 a2 ==>b n1 <=? n2
-  |E_Gt a1 a2 n1 n2 : a1 ==> n1 -> a2 ==> n2 -> BGt a1 a2 ==>b negb (n1 <=? n2)
-  |E_BNot e b : e ==>b b -> BNot e ==>b negb b 
-  |E_BAnd a1 a2 n1 n2 : a1 ==>b n1 -> a2 ==>b n2 -> BAnd a1 a2 ==>b andb n1 n2
+(* FILL IN HERE *)
 where "e '==>b' b" := (bevalR e b) : type_scope
 .
 
 Lemma beval_iff_bevalR : forall b bv,
   b ==>b bv <-> beval b = bv.
 Proof.
-  split.
-  - intros. 
-    induction H; try (apply aeval_iff_aevalR' in H, H0); subst; try reflexivity. 
-  - generalize dependent bv.
-    induction b; simpl; intros; subst; constructor; try apply aeval_iff_aevalR';
-    try apply IHb; try apply IHb1; try apply IHb2; reflexivity.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 End AExp.
@@ -1339,8 +1310,8 @@ Locate ";".
 Locate "while".
 (* ===>
     Notation
-      "'while' x 'do' y 'end'" := CWhile x y : com_scope (default interpretation)
-      "'_' '!->' v" := t_empty v (default interpretation)
+      "'while' x 'do' y 'end'" :=
+          CWhile x y : com_scope (default interpretation)
 *)
 
 (* ================================================================= *)
@@ -1571,13 +1542,7 @@ Example ceval_example2:
     Z := 2
   ]=> (Z !-> 2 ; Y !-> 1 ; X !-> 0).
 Proof.
-  simpl.
-  apply E_Seq with (X !-> 0).
-  - apply E_Asgn. reflexivity.
-  - apply E_Seq with (Y !-> 1;X !->0).
-    + apply E_Asgn. reflexivity.
-    + apply E_Asgn. reflexivity.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 Set Printing Implicit.
@@ -1591,33 +1556,15 @@ Check @ceval_example2.
     which you can reverse-engineer to discover the program you should
     write.  The proof of that theorem will be somewhat lengthy. *)
 
-Definition pup_to_n : com :=
-  <{  Y := 0;
-      while 1 <= X do
-                    Y := Y + X;
-                    X := X - 1
-     end}>.
+Definition pup_to_n : com
+  (* REPLACE THIS LINE WITH ":= _your_definition_ ." *). Admitted.
 
 Theorem pup_to_2_ceval :
   (X !-> 2) =[
     pup_to_n
   ]=> (X !-> 0 ; Y !-> 3 ; X !-> 1 ; Y !-> 2 ; Y !-> 0 ; X !-> 2).
 Proof.
-  unfold pup_to_n.
-  apply E_Seq with (Y !-> 0; X !-> 2).
-  - apply E_Asgn. reflexivity.
-  - apply E_WhileTrue with (X !-> 1; Y !-> 2; Y !-> 0; X !-> 2).
-    + reflexivity.
-    + apply E_Seq with ( Y !-> 2; Y !-> 0; X !-> 2).
-      * apply E_Asgn. reflexivity.
-      * apply E_Asgn. reflexivity.
-    + apply E_WhileTrue with (X !-> 0; Y !-> 3; X !-> 1; Y !-> 2; Y !-> 0; X !-> 2).
-      * reflexivity.
-      * apply E_Seq with (Y !-> 3; X !-> 1; Y !-> 2; Y !-> 0; X !-> 2).
-        -- apply E_Asgn. reflexivity.
-        -- apply E_Asgn. reflexivity.
-      * apply E_WhileFalse. reflexivity.
-Qed.
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (* ================================================================= *)
@@ -1711,10 +1658,8 @@ Proof.
       [loopdef] terminates.  Most of the cases are immediately
       contradictory and so can be solved in one step with
       [discriminate]. *)
-  induction contra; try (discriminate).
-  - injection Heqloopdef. intros. rewrite H1 in H. discriminate H.
-  - apply IHcontra2. apply Heqloopdef.
-Qed.
+
+  (* FILL IN HERE *) Admitted.
 (** [] *)
 
 (** **** Exercise: 3 stars, standard (no_whiles_eqv)
@@ -2115,4 +2060,4 @@ End BreakImp.
 
     [] *)
 
-(* 2023-03-25 11:11 *)
+(* 2023-08-23 11:31 *)

@@ -375,6 +375,7 @@ Ltac find_rwd :=
     Adding this tactic to the ones that we invoke in each case of the
     induction handles all of the contradictory cases. *)
 
+
 Theorem ceval_deterministic''': forall c st st1 st2,
   st =[ c ]=> st1  ->
   st =[ c ]=> st2 ->

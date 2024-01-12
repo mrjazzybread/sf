@@ -71,7 +71,10 @@ Proof.
 Theorem plus_one_r' : forall n:nat,
   n + 1 = S n.
 Proof.
-  (* FILL IN HERE *) Admitted.
+  intros.
+  rewrite add_comm.
+  reflexivity. 
+Qed.
 (** [] *)
 
 (** Coq generates induction principles for every datatype
@@ -118,7 +121,7 @@ Inductive rgb : Type :=
   | red
   | green
   | blue.
-Check rgb_ind.
+Check rgb_ind : forall P : rgb -> Prop, P red -> P green -> P blue -> forall t : rgb, P t.
 (** [] *)
 
 (** Here's another example, this time with one of the constructors
@@ -179,7 +182,11 @@ Inductive booltree : Type :=
   | bt_empty
   | bt_leaf (b : bool)
   | bt_branch (b : bool) (t1 t2 : booltree).
-
+Check booltree_ind : 
+  forall P : booltree -> Prop,
+    P bt_empty -> (forall b, P (bt_leaf b)) -> 
+    (forall b t1, P t1 -> (forall t2, P t2 -> P (bt_branch b t1 t2))) ->
+    forall t : booltree, P t.
 (* What is the induction principle for [booltree]? Of course you could
    ask Coq, but try not to do that. Instead, write it down yourself on
    paper. Then look at the definition of [booltree_ind_type], below.
