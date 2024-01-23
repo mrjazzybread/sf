@@ -296,7 +296,7 @@ Definition inplace_double : val :=
 Lemma inplace_double_triple :  forall (p:loc) (pm:int),
     triple (inplace_double p)
       (p ~~> pm)
-      (fun r => p ~~> (pm * 2)).
+      (fun _ => p ~~> (pm * 2)).
 Proof.
   xwp.
   repeat xapp.

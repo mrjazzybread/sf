@@ -400,7 +400,19 @@ Qed.
 
 Lemma hstar_hempty_l : forall H,
   \[] \* H = H.
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros. applys hprop_eq. split; intros.
+  - destruct H0. destruct H0 as [h2 [H1 [H2 [H3 H4]]]].
+    unfold hempty in H1.
+    rewrite H1 in H4.
+    rewrite Fmap.union_empty_l in H4.
+    subst. auto.
+  - rewrite <- Fmap.union_empty_l.
+    apply hstar_intro.
+    + apply hempty_intro.
+    + auto.
+    + auto.
+Qed .
 
 (** [] *)
 
@@ -475,7 +487,14 @@ Proof using.
     { exists* h2 h3. }
     { rewrite* @Fmap.disjoint_union_eq_r. }
     { rewrite* @Fmap.union_assoc in U. } }
-(* FILL IN HERE *) Admitted.
+  - intros. destruct H as [h1 [h' [H4 [[h2 [h3 [H9 [H10 [H11 H12]]]]] [H7 H8]]]]].
+    subst. rewrite Fmap.disjoint_union_eq_r in H7.
+    exists (h1 \u h2) h3. splits.
+    + exists* h1 h2.
+    + apply H10.
+    + rewrite* <- @Fmap.disjoint_union_eq_l in H7.
+    + rewrite* <- @Fmap.union_assoc.
+Qed.
 
 (** [] *)
 
@@ -495,7 +514,12 @@ Qed.
 
 Lemma hstar_comm_assoc : forall H1 H2 H3,
   H1 \* H2 \* H3 = H2 \* H1 \* H3.
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros.  rewrite <- hstar_assoc.
+  rewrite hstar_comm with H1 H2.
+  rewrite hstar_assoc.
+  auto.
+Qed.
 
 (** [] *)
 
@@ -523,7 +547,16 @@ Proof using. (* FILL IN HERE *) Admitted.
 
 Lemma hstar_hpure_l : forall P H h,
   (\[P] \* H) h = (P /\ H h).
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros. apply propositional_extensionality. split.
+  - intros. destruct H0 as [h1 [h2 [H1 [H2 [H3 H4]]]]].
+    destruct H1. subst. rewrite Fmap.union_empty_l. split; auto.
+  - intros [H1 H2]. exists (@Fmap.empty loc val) h. splits.
+    + apply hpure_intro. auto.
+    + auto.
+    + auto.
+    + symmetry. apply Fmap.union_empty_l.                             
+Qed.
 
 (** [] *)
 
@@ -660,7 +693,10 @@ Axiom functional_extensionality : forall A B (f g:A->B),
 Lemma predicate_extensionality_derived : forall A (P Q:A->Prop),
   (forall x, P x <-> Q x) ->
   P = Q.
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros. apply functional_extensionality. intros.
+  apply propositional_extensionality. apply H.
+Qed.
 
 (** [] *)
 
