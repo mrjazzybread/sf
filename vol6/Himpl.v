@@ -84,7 +84,11 @@ Lemma himpl_antisym : forall H1 H2,
   (H1 ==> H2) ->
   (H2 ==> H1) ->
   H1 = H2.
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros.
+  apply predicate_extensionality.
+  intros. split; auto.
+Qed.
 
 (** [] *)
 
@@ -127,8 +131,12 @@ Lemma qimpl_antisym : forall Q1 Q2,
   (Q1 ===> Q2) ->
   (Q2 ===> Q1) ->
   (Q1 = Q2).
-Proof using.  (* FILL IN HERE *) Admitted.
-
+Proof using.
+  intros. unfold qimpl in *.
+  apply functional_extensionality. intros.
+  specialize H with x. specialize H0 with x.
+  apply predicate_extensionality. intro x1. split; eauto.
+Qed.
 (** [] *)
 
 (* ================================================================= *)
@@ -170,7 +178,13 @@ Lemma himpl_hstar_hpure_r : forall P H H',
   P ->
   (H ==> H') ->
   H ==> (\[P] \* H').
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros.
+  unfold himpl.
+  intros.
+  rewrite hstar_hpure_l.
+  auto.
+Qed.
 
 (** [] *)
 
@@ -187,7 +201,15 @@ Proof using. (* FILL IN HERE *) Admitted.
 Lemma himpl_hstar_hpure_l : forall (P:Prop) (H H':hprop),
   (P -> H ==> H') ->
   (\[P] \* H) ==> H'.
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros. unfold himpl in *. intros.
+  specialize H0 with h.
+  rewrite hstar_hpure_l in H1.
+  destruct H1.
+  apply H0; auto.
+Qed.
+
+
 
 (** [] *)
 
@@ -202,7 +224,10 @@ Proof using. (* FILL IN HERE *) Admitted.
 Lemma himpl_hexists_r : forall A (x:A) H J,
   (H ==> J x) ->
   H ==> (\exists x, J x).
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  unfold himpl in *. intros. specialize H0 with h. apply H0 in H1.
+  exists x. auto.
+Qed.
 
 (** [] *)
 
@@ -225,7 +250,10 @@ Proof using. (* FILL IN HERE *) Admitted.
 Lemma himpl_hexists_l : forall (A:Type) (H:hprop) (J:A->hprop),
   (forall x, J x ==> H) ->
   (\exists x, J x) ==> H.
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  unfold himpl. intros. destruct H1.
+  apply H0 in H1. auto.
+Qed.
 
 (** [] *)
 
@@ -282,9 +310,15 @@ Qed.
     , as well as the extraction rules [himpl_hexists_l] and
     [himpl_hstar_hpure_l]. *)
 
+Search hexists.
+
 Lemma hexists_named_eq : forall H,
   H = (\exists h, \[H h] \* (= h)).
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros. apply predicate_extensionality. intros. split.
+  - intros. apply hexists_intro with x. rewrite hstar_hpure_l. auto.
+  - intros. destruct H0. rewrite hstar_hpure_l in H0. destruct H0. rewrite H1. auto.
+Qed.
 
 (** [] *)
 
@@ -305,7 +339,7 @@ Implicit Types n m : int.
 (** Quiz: For each entailment relation, indicate (without a Coq proof) whether
     it is true or false. Solutions appear further on. *)
 
-Parameter case_study_1 : forall p q,
+Parameter case_study_1 : forall p q, 
       p ~~> 3 \* q ~~> 4
   ==> q ~~> 4 \* p ~~> 3.
 
@@ -464,7 +498,26 @@ Implicit Types n : int.
 Lemma himpl_example_1 : forall p1 p2 p3 p4,
       p1 ~~> 6 \* p2 ~~> 7 \* p3 ~~> 8 \* p4 ~~> 9
   ==> p4 ~~> 9 \* p3 ~~> 8 \* p2 ~~> 7 \* p1 ~~> 6.
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros.
+  rewrite hstar_comm. Search hstar.
+  rewrite hstar_assoc.
+  rewrite hstar_assoc.
+  rewrite hstar_comm.
+  rewrite hstar_assoc.
+  rewrite hstar_assoc.
+  rewrite hstar_comm.
+  rewrite hstar_assoc.
+  rewrite hstar_assoc.
+  apply himpl_frame_r.
+  rewrite hstar_comm.
+  rewrite hstar_assoc.
+  rewrite hstar_comm.
+  rewrite hstar_assoc.
+  apply himpl_frame_r.
+  rewrite hstar_comm.
+  auto.
+Qed.
 
 (** [] *)
 
@@ -477,7 +530,12 @@ Proof using. (* FILL IN HERE *) Admitted.
 Lemma himpl_example_2 : forall p1 p2 p3 n,
       p1 ~~> 6 \* \[n > 0] \* p2 ~~> 7 \* \[n < 0]
   ==> p3 ~~> 8.
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros. rewrite hstar_comm_assoc. apply himpl_hstar_hpure_l. intros.
+  rewrite hstar_comm. rewrite hstar_comm with (p2 ~~> 7) (\[n<0]).
+  rewrite hstar_assoc. apply himpl_hstar_hpure_l. intros.
+  math.
+Qed.
 
 (** [] *)
 
@@ -490,7 +548,13 @@ Proof using. (* FILL IN HERE *) Admitted.
 Lemma himpl_example_3 : forall p,
       \exists n, p ~~> n \* \[n > 0]
   ==> \exists n, \[n > 1] \* p ~~> (n-1).
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros.  apply himpl_hexists_l. intros. apply himpl_hexists_r with (x+1).
+  rewrite hstar_comm. apply himpl_hstar_hpure_l. intros.
+  apply himpl_hstar_hpure_r.
+  + math.
+  + unfold himpl. intros. rewrite plus_one_minus_one_l. apply H0.
+Qed.
 
 (** [] *)
 
@@ -711,7 +775,7 @@ Lemma xsimpl_example_3 : forall (p:loc),
   \exists (n:int), p ~~> n ==>
   \exists (m:int), p ~~> (m + 1).
 Proof using.
-  intros. (* observe that [xsimpl] would not work well here. *)
+  intros. 
   xpull. intros n. xsimpl (n-1). math.
 Qed.
 
@@ -775,7 +839,12 @@ Lemma xchange_lemma : forall H1 H1' H H' H2,
   H ==> H1 \* H2 ->
   H1' \* H2 ==> H' ->
   H ==> H'.
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros. intros h H6.
+  apply H4. 
+  apply himpl_frame_l with (H2:=H2) in H0.
+  auto.
+Qed.
 
 (** [] *)
 
@@ -803,7 +872,13 @@ Module EntailmentRulesProofs.
 Lemma himpl_frame_l : forall H2 H1 H1',
   H1 ==> H1' ->
   (H1 \* H2) ==> (H1' \* H2).
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros. intros h H3.
+  unfold hstar in H3.
+  destruct H3 as [h1 [h2 [H4 [H5 [H6 H7]]]]].
+  apply H in H4. unfold hstar.
+  exists h1 h2. auto.
+Qed.
 
 (** [] *)
 
@@ -816,7 +891,9 @@ Proof using. (* FILL IN HERE *) Admitted.
 Lemma himpl_frame_r : forall H1 H2 H2',
   H2 ==> H2' ->
   (H1 \* H2) ==> (H1 \* H2').
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros. rewrite hstar_comm. rewrite hstar_comm with (H2:=H2'). apply himpl_frame_l. auto.
+Qed.
 
 (** [] *)
 
@@ -831,7 +908,14 @@ Lemma himpl_frame_lr : forall H1 H1' H2 H2',
   H1 ==> H1' ->
   H2 ==> H2' ->
   (H1 \* H2) ==> (H1' \* H2').
-Proof using. (* FILL IN HERE *) Admitted.
+Proof using.
+  intros. intros h H3.
+  destruct H3 as [h1 [h2 [H4 [H5 [H6 H7]]]]].
+  apply H in H4.
+  apply H0 in H5.
+  rewrite H7.
+  apply hstar_intro; auto.
+Qed.
 
 (** [] *)
 
